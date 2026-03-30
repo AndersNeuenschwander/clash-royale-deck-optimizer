@@ -1,0 +1,14 @@
+setup.py
+app/__init__.py
+app/api/__init__.py
+app/core/__init__.py
+app/core/analyzer.py
+app/core/models.py
+app/data/__init__.py
+app/data/card_loader.py
+app/data/client.py
+clash_optimizer.egg-info/PKG-INFO
+clash_optimizer.egg-info/SOURCES.txt
+clash_optimizer.egg-info/dependency_links.txt
+clash_optimizer.egg-info/top_level.txt
+tests/test_analyzer.py

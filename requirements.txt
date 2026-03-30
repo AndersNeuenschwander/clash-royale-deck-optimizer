@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+httpx
+python-dotenv
+echo "sqlalchemy
+psycopg2-binary
+passlib[bcrypt]
+python-jose[cryptography]
+python-multipart" >> requirements.txt

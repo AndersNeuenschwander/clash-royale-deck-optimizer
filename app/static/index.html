@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Clash Royale Deck Optimizer</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f1a;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      border-bottom: 2px solid #e8b84b;
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    header h1 { font-size: 1.6rem; color: #e8b84b; letter-spacing: 1px; }
+    header p  { color: #aaa; font-size: 0.9rem; }
+
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-email { color: #aaa; font-size: 0.85rem; }
+
+    .btn {
+      padding: 10px 20px;
+      background: #e8b84b;
+      color: #0f0f1a;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn:hover { background: #f5cc6e; }
+    .btn:disabled { background: #555; color: #999; cursor: not-allowed; }
+
+    .btn-outline {
+      padding: 10px 20px;
+      background: transparent;
+      color: #e8b84b;
+      border: 1px solid #e8b84b;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-outline:hover { background: #e8b84b22; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+
+    /* Auth screen */
+    .auth-screen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 80px);
+    }
+
+    .auth-box {
+      background: #1a1a2e;
+      border: 1px solid #2a2a4a;
+      border-radius: 16px;
+      padding: 40px;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .auth-box h2 {
+      color: #e8b84b;
+      margin-bottom: 8px;
+      font-size: 1.4rem;
+    }
+
+    .auth-box p {
+      color: #aaa;
+      font-size: 0.85rem;
+      margin-bottom: 28px;
+    }
+
+    .auth-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 24px;
+      border-bottom: 1px solid #2a2a4a;
+    }
+
+    .auth-tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      color: #888;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: all 0.2s;
+    }
+
+    .auth-tab.active {
+      color: #e8b84b;
+      border-bottom-color: #e8b84b;
+    }
+
+    .form-group { margin-bottom: 16px; }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      color: #aaa;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px 14px;
+      background: #0f0f1a;
+      border: 1px solid #3a3a5a;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus { border-color: #e8b84b; }
+
+    .form-group .hint {
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    .auth-btn {
+      width: 100%;
+      padding: 13px;
+      background: #e8b84b;
+      color: #0f0f1a;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s;
+    }
+
+    .auth-btn:hover { background: #f5cc6e; }
+    .auth-btn:disabled { background: #555; color: #999; cursor: not-allowed; }
+
+    .auth-error {
+      background: #2a0f0f;
+      border: 1px solid #f87171;
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #f87171;
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+    }
+
+    .auth-success {
+      background: #0f2a0f;
+      border: 1px solid #4ade80;
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #4ade80;
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+    }
+
+    /* Main app */
+    .search-box {
+      background: #1a1a2e;
+      border: 1px solid #2a2a4a;
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    .search-box h2 { color: #e8b84b; margin-bottom: 8px; }
+    .search-box .subtitle { color: #aaa; margin-bottom: 12px; font-size: 0.9rem; }
+    .search-box .hint-box {
+      color: #e8b84b;
+      font-size: 0.85rem;
+      margin-bottom: 20px;
+      background: #e8b84b11;
+      border: 1px solid #e8b84b33;
+      border-radius: 8px;
+      padding: 10px 16px;
+      display: inline-block;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 12px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .search-row input {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid #3a3a5a;
+      background: #0f0f1a;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      text-transform: uppercase;
+    }
+
+    .search-row input:focus { border-color: #e8b84b; }
+
+    .player-header {
+      background: #1a1a2e;
+      border: 1px solid #2a2a4a;
+      border-radius: 12px;
+      padding: 20px 28px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .player-name { font-size: 1.4rem; font-weight: 700; color: #e8b84b; }
+    .player-meta { color: #aaa; font-size: 0.9rem; margin-top: 4px; }
+
+    .trophy-badge {
+      background: #e8b84b22;
+      border: 1px solid #e8b84b55;
+      color: #e8b84b;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .card {
+      background: #1a1a2e;
+      border: 1px solid #2a2a4a;
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .card h3 {
+      font-size: 1rem;
+      color: #e8b84b;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .deck-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .deck-card {
+      background: #0f0f1a;
+      border: 1px solid #2a2a4a;
+      border-radius: 8px;
+      padding: 10px 6px;
+      text-align: center;
+    }
+
+    .deck-card img {
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+      border-radius: 6px;
+    }
+
+    .deck-card .card-name {
+      font-size: 0.7rem;
+      color: #ccc;
+      margin-top: 6px;
+      line-height: 1.2;
+    }
+
+    .elixir-dot {
+      display: inline-block;
+      background: #8b5cf6;
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 700;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      line-height: 18px;
+      margin-top: 4px;
+    }
+
+    .exposure-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 12px;
+    }
+
+    .exposure-label {
+      width: 90px;
+      font-size: 0.8rem;
+      color: #aaa;
+      flex-shrink: 0;
+    }
+
+    .bar-track {
+      flex: 1;
+      height: 8px;
+      background: #0f0f1a;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.6s ease;
+    }
+
+    .exposure-value {
+      width: 36px;
+      text-align: right;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .threat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .threat-item {
+      background: #0f0f1a;
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .threat-label { font-size: 0.8rem; color: #aaa; }
+    .threat-rate  { font-size: 0.9rem; font-weight: 700; color: #e8b84b; }
+
+    .suggestions-section { margin-top: 20px; }
+
+    .suggestion-card {
+      background: #1a1a2e;
+      border: 1px solid #2a2a4a;
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      transition: border-color 0.2s;
+    }
+
+    .suggestion-card:first-child {
+      border-color: #e8b84b;
+      background: #1e1a0e;
+    }
+
+    .suggestion-card:hover { border-color: #e8b84b88; }
+
+    .swap-cards {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .swap-card-chip { text-align: center; width: 72px; }
+
+    .swap-card-chip img {
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+      border-radius: 6px;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .swap-placeholder {
+      width: 56px;
+      height: 56px;
+      background: #2a2a4a;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      margin: 0 auto;
+    }
+
+    .chip-name {
+      font-size: 0.7rem;
+      font-weight: 600;
+      margin-top: 6px;
+      line-height: 1.2;
+    }
+
+    .chip-elixir { font-size: 0.65rem; color: #8b5cf6; margin-top: 2px; }
+
+    .swap-out .chip-name { color: #f87171; }
+    .swap-in  .chip-name { color: #4ade80; }
+    .swap-out img { border: 2px solid #f87171; opacity: 0.7; }
+    .swap-in  img { border: 2px solid #4ade80; }
+
+    .swap-arrow { font-size: 1.4rem; color: #e8b84b; flex-shrink: 0; }
+
+    .suggestion-details { flex: 1; }
+
+    .suggestion-explanation { font-size: 0.85rem; color: #ccc; line-height: 1.5; }
+
+    .improvement-badge {
+      background: #4ade8022;
+      border: 1px solid #4ade8055;
+      color: #4ade80;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-top: 8px;
+      display: inline-block;
+    }
+
+    .best-badge {
+      background: #e8b84b22;
+      border: 1px solid #e8b84b;
+      color: #e8b84b;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: inline-block;
+    }
+
+    .score-display {
+      text-align: center;
+      padding: 16px;
+      background: #0f0f1a;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+
+    .score-number { font-size: 2.2rem; font-weight: 700; color: #e8b84b; }
+    .score-label  { font-size: 0.75rem; color: #888; margin-top: 4px; }
+
+    .error-box {
+      background: #2a0f0f;
+      border: 1px solid #f87171;
+      border-radius: 8px;
+      padding: 16px 20px;
+      color: #f87171;
+      margin-bottom: 20px;
+    }
+
+    .loading { text-align: center; padding: 60px; color: #888; }
+    .loading .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid #333;
+      border-top-color: #e8b84b;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .hidden { display: none; }
+
+    .avg-elixir {
+      text-align: center;
+      font-size: 1rem;
+      color: #8b5cf6;
+      margin-top: 12px;
+      font-weight: 600;
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .saved-tag-banner {
+      background: #0f2a0f;
+      border: 1px solid #4ade8044;
+      border-radius: 8px;
+      padding: 10px 16px;
+      color: #4ade80;
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>⚔️ Clash Royale Deck Optimizer</h1>
+    <p>Arena-weighted vulnerability analysis powered by your real battle data</p>
+  </div>
+  <div class="header-user hidden" id="headerUser">
+    <span class="header-email" id="headerEmail"></span>
+    <button class="btn-outline" onclick="logout()">Log out</button>
+  </div>
+</header>
+
+<!-- Auth Screen -->
+<div id="authScreen" class="auth-screen">
+  <div class="auth-box">
+    <h2>Welcome Back</h2>
+    <p>Sign in to save your deck history and get personalized analysis</p>
+
+    <div class="auth-tabs">
+      <div class="auth-tab active" id="loginTab" onclick="switchTab('login')">Sign In</div>
+      <div class="auth-tab" id="registerTab" onclick="switchTab('register')">Create Account</div>
+    </div>
+
+    <div id="authError" class="auth-error hidden"></div>
+    <div id="authSuccess" class="auth-success hidden"></div>
+
+    <!-- Login Form -->
+    <div id="loginForm">
+      <div class="form-group">
+        <label>Email</label>
+        <input id="loginEmail" type="email" placeholder="you@example.com" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input id="loginPassword" type="password" placeholder="••••••••"
+          onkeydown="if(event.key==='Enter') doLogin()" />
+      </div>
+      <button class="auth-btn" id="loginBtn" onclick="doLogin()">Sign In</button>
+    </div>
+
+    <!-- Register Form -->
+    <div id="registerForm" class="hidden">
+      <div class="form-group">
+        <label>Email</label>
+        <input id="regEmail" type="email" placeholder="you@example.com" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input id="regPassword" type="password" placeholder="••••••••" />
+      </div>
+      <div class="form-group">
+        <label>Clash Royale Player Tag (optional)</label>
+        <input id="regTag" type="text" placeholder="#ABC123"
+          oninput="this.value=this.value.toUpperCase()" />
+        <div class="hint">📱 Open Clash Royale → tap your name → copy the #tag beneath it</div>
+      </div>
+      <button class="auth-btn" id="registerBtn" onclick="doRegister()">Create Account</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Main App -->
+<div id="appScreen" class="hidden">
+  <div class="container">
+
+    <div class="search-box">
+      <h2>Analyze Your Deck</h2>
+      <p class="subtitle">Enter your player tag to get a personalized deck analysis and swap suggestions</p>
+      <p class="hint-box">
+        📱 To find your player tag: open Clash Royale → tap your display name in the top left corner → your tag is the <strong>#ABC123</strong> shown beneath your name
+      </p>
+      <div id="savedTagBanner" class="saved-tag-banner hidden"></div>
+      <div class="search-row">
+        <input id="tagInput" type="text" placeholder="#ABC123" />
+        <button class="btn" id="analyzeBtn" onclick="analyze()">Analyze</button>
+      </div>
+    </div>
+
+    <div id="errorBox" class="error-box hidden"></div>
+
+    <div id="loadingBox" class="loading hidden">
+      <div class="spinner"></div>
+      <p>Fetching your battle data and running analysis...</p>
+    </div>
+
+    <div id="results" class="hidden">
+
+      <div class="player-header" id="playerHeader"></div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Current Deck</h3>
+          <div class="deck-grid" id="deckGrid"></div>
+          <div class="avg-elixir" id="avgElixir"></div>
+        </div>
+
+        <div class="card">
+          <h3>Vulnerability Profile</h3>
+          <div class="score-display">
+            <div class="score-number" id="overallScore"></div>
+            <div class="score-label">Arena-weighted vulnerability score (lower = better)</div>
+          </div>
+          <div id="exposureBars"></div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Your Arena Meta</h3>
+          <p class="section-label" id="metaSubtitle"></p>
+          <div class="threat-grid" id="threatGrid"></div>
+        </div>
+
+        <div class="card">
+          <h3>Factor Weights</h3>
+          <p class="section-label">How much each threat matters in your arena</p>
+          <div id="weightBars"></div>
+        </div>
+      </div>
+
+      <div class="suggestions-section">
+        <div class="card">
+          <h3>Swap Suggestions</h3>
+          <div id="suggestionsList"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_BASE = "http://localhost:8000";
+  let cardIconCache = {};
+  let authToken = localStorage.getItem("auth_token");
+  let currentUser = null;
+
+  // --- Boot ---
+  async function boot() {
+    await loadCardIcons();
+    if (authToken) {
+      try {
+        const res = await fetch(`${API_BASE}/auth/me`, {
+          headers: { Authorization: `Bearer ${authToken}` }
+        });
+        if (res.ok) {
+          currentUser = await res.json();
+          showApp();
+          return;
+        }
+      } catch (e) {}
+      // Token invalid — clear it
+      localStorage.removeItem("auth_token");
+      authToken = null;
+    }
+    showAuth();
+  }
+
+  function showAuth() {
+    show("authScreen");
+    hide("appScreen");
+    hide("headerUser");
+  }
+
+  function showApp() {
+    hide("authScreen");
+    show("appScreen");
+    show("headerUser");
+    document.getElementById("headerEmail").textContent = currentUser.email;
+
+    // Pre-fill player tag if saved
+    if (currentUser.player_tag) {
+      const tag = "#" + currentUser.player_tag;
+      document.getElementById("tagInput").value = tag;
+      document.getElementById("savedTagBanner").textContent =
+        `✓ Using your saved player tag: ${tag}`;
+      show("savedTagBanner");
+    }
+  }
+
+  // --- Auth tab switching ---
+  function switchTab(tab) {
+    hide("authError");
+    hide("authSuccess");
+    if (tab === "login") {
+      show("loginForm");
+      hide("registerForm");
+      document.getElementById("loginTab").classList.add("active");
+      document.getElementById("registerTab").classList.remove("active");
+    } else {
+      hide("loginForm");
+      show("registerForm");
+      document.getElementById("registerTab").classList.add("active");
+      document.getElementById("loginTab").classList.remove("active");
+    }
+  }
+
+  // --- Login ---
+  async function doLogin() {
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
+    if (!email || !password) return showAuthError("Please fill in all fields");
+
+    document.getElementById("loginBtn").disabled = true;
+    hide("authError");
+
+    try {
+      const res = await fetch(`${API_BASE}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Login failed");
+
+      authToken = data.access_token;
+      localStorage.setItem("auth_token", authToken);
+
+      // Fetch user profile
+      const meRes = await fetch(`${API_BASE}/auth/me`, {
+        headers: { Authorization: `Bearer ${authToken}` }
+      });
+      currentUser = await meRes.json();
+      showApp();
+
+    } catch (e) {
+      showAuthError(e.message);
+    } finally {
+      document.getElementById("loginBtn").disabled = false;
+    }
+  }
+
+  // --- Register ---
+  async function doRegister() {
+    const email = document.getElementById("regEmail").value.trim();
+    const password = document.getElementById("regPassword").value;
+    const player_tag = document.getElementById("regTag").value.trim() || null;
+
+    if (!email || !password) return showAuthError("Please fill in email and password");
+    if (password.length < 6) return showAuthError("Password must be at least 6 characters");
+
+    document.getElementById("registerBtn").disabled = true;
+    hide("authError");
+
+    try {
+      const res = await fetch(`${API_BASE}/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, player_tag })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Registration failed");
+
+      // Auto login after register
+      showAuthSuccess("Account created! Signing you in...");
+      document.getElementById("loginEmail").value = email;
+      document.getElementById("loginPassword").value = password;
+      setTimeout(() => doLogin(), 800);
+
+    } catch (e) {
+      showAuthError(e.message);
+    } finally {
+      document.getElementById("registerBtn").disabled = false;
+    }
+  }
+
+  // --- Logout ---
+  function logout() {
+    localStorage.removeItem("auth_token");
+    authToken = null;
+    currentUser = null;
+    hide("results");
+    showAuth();
+  }
+
+  // --- Card icons ---
+  async function loadCardIcons() {
+    try {
+      const res = await fetch(`${API_BASE}/cards`);
+      if (res.ok) cardIconCache = await res.json();
+    } catch (e) {
+      console.warn("Could not preload card icons:", e);
+    }
+  }
+
+  function getCardIcon(name) {
+    return cardIconCache[name.toLowerCase()] || null;
+  }
+
+  function cardImage(name, iconUrl, borderColor, opacity) {
+    const url = iconUrl || getCardIcon(name);
+    if (url) {
+      return `<img src="${url}" alt="${name}"
+        style="width:56px;height:56px;object-fit:contain;border-radius:6px;
+               display:block;margin:0 auto;
+               border:2px solid ${borderColor};
+               opacity:${opacity};" />`;
+    }
+    return `<div class="swap-placeholder">⚔️</div>`;
+  }
+
+  // --- Tag input ---
+  document.getElementById("tagInput").addEventListener("input", e => {
+    const pos = e.target.selectionStart;
+    e.target.value = e.target.value.toUpperCase();
+    e.target.setSelectionRange(pos, pos);
+  });
+
+  document.getElementById("tagInput").addEventListener("keydown", e => {
+    if (e.key === "Enter") analyze();
+  });
+
+  // --- Analyze ---
+  async function analyze() {
+    const tag = document.getElementById("tagInput").value.trim().replace("#", "");
+    if (!tag) return;
+
+    setLoading(true);
+    hide("errorBox");
+    hide("results");
+
+    try {
+      const res = await fetch(`${API_BASE}/player/${tag}`, {
+        headers: authToken ? { Authorization: `Bearer ${authToken}` } : {}
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.detail || "Failed to fetch player data");
+      }
+      const data = await res.json();
+      render(data);
+      show("results");
+
+      // Save snapshot and update player tag if logged in
+      if (authToken && currentUser) {
+        saveSnapshot(data);
+        if (!currentUser.player_tag) {
+          updatePlayerTag(tag);
+        }
+      }
+
+    } catch (e) {
+      showError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function saveSnapshot(data) {
+    try {
+      await fetch(`${API_BASE}/user/snapshots`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`
+        },
+        body: JSON.stringify({
+          player_tag: data.player.tag,
+          arena: data.player.arena,
+          cards: data.current_deck.map(c => c.name),
+          analysis: data.analysis,
+          weighted_score: data.analysis.weighted_score
+        })
+      });
+    } catch (e) {
+      console.warn("Could not save snapshot:", e);
+    }
+  }
+
+  async function updatePlayerTag(tag) {
+    try {
+      const res = await fetch(`${API_BASE}/auth/me/player-tag`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`
+        },
+        body: JSON.stringify({ player_tag: tag })
+      });
+      if (res.ok) {
+        currentUser.player_tag = tag;
+      }
+    } catch (e) {
+      console.warn("Could not update player tag:", e);
+    }
+  }
+
+  // --- Render ---
+  function render(data) {
+    renderPlayer(data.player);
+    renderDeck(data.current_deck, data.analysis.average_elixir);
+    renderExposures(data.analysis);
+    renderMeta(data.meta);
+    renderWeights(data.meta.weights);
+    renderSuggestions(data.suggestions);
+  }
+
+  function renderPlayer(p) {
+    document.getElementById("playerHeader").innerHTML = `
+      <div>
+        <div class="player-name">${p.name}</div>
+        <div class="player-meta">${p.tag} · ${p.arena}</div>
+      </div>
+      <div class="trophy-badge">🏆 ${p.trophies.toLocaleString()}</div>
+    `;
+  }
+
+  function renderDeck(cards, avgElixir) {
+    document.getElementById("deckGrid").innerHTML = cards.map(c => `
+      <div class="deck-card">
+        ${c.icon_url
+          ? `<img src="${c.icon_url}" alt="${c.name}"
+               style="width:56px;height:56px;object-fit:contain;border-radius:6px;" />`
+          : `<div style="width:56px;height:56px;background:#2a2a4a;border-radius:6px;
+               margin:0 auto;display:flex;align-items:center;justify-content:center;
+               font-size:1.4rem;">⚔️</div>`
+        }
+        <div class="card-name">${c.name}</div>
+        <div class="elixir-dot">${c.elixir}</div>
+      </div>
+    `).join("");
+    document.getElementById("avgElixir").textContent = `Avg Elixir: ${avgElixir}`;
+  }
+
+  function renderExposures(analysis) {
+    document.getElementById("overallScore").textContent =
+      analysis.weighted_score.toFixed(3);
+
+    const exposures = [
+      { label: "Air",      value: analysis.air_exposure },
+      { label: "Tank",     value: analysis.tank_exposure },
+      { label: "Swarm",    value: analysis.swarm_exposure },
+      { label: "Spell",    value: analysis.spell_exposure },
+      { label: "Building", value: analysis.building_exposure },
+      { label: "Elixir",   value: analysis.elixir_risk },
+    ];
+
+    document.getElementById("exposureBars").innerHTML = exposures.map(e => {
+      const pct = Math.round(e.value * 100);
+      const color = pct >= 70 ? "#f87171" : pct >= 40 ? "#fbbf24" : "#4ade80";
+      return `
+        <div class="exposure-row">
+          <div class="exposure-label">${e.label}</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${pct}%;background:${color}"></div>
+          </div>
+          <div class="exposure-value" style="color:${color}">${pct}%</div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function renderMeta(meta) {
+    document.getElementById("metaSubtitle").textContent =
+      `${meta.arena} · ${meta.sample_size} battles analyzed`;
+
+    const threats = [
+      { label: "Air Threats",      value: meta.threat_rates.air },
+      { label: "Tank Threats",     value: meta.threat_rates.tank },
+      { label: "Swarm Threats",    value: meta.threat_rates.swarm },
+      { label: "Spell Threats",    value: meta.threat_rates.spell },
+      { label: "Building Threats", value: meta.threat_rates.building },
+      { label: "High Elixir",      value: meta.threat_rates.high_elixir },
+    ];
+
+    document.getElementById("threatGrid").innerHTML = threats.map(t => `
+      <div class="threat-item">
+        <span class="threat-label">${t.label}</span>
+        <span class="threat-rate">${Math.round(t.value * 100)}%</span>
+      </div>
+    `).join("");
+  }
+
+  function renderWeights(weights) {
+    const entries = Object.entries(weights).sort((a, b) => b[1] - a[1]);
+    document.getElementById("weightBars").innerHTML = entries.map(([k, v]) => {
+      const pct = Math.round(v * 100);
+      return `
+        <div class="exposure-row">
+          <div class="exposure-label" style="text-transform:capitalize">${k}</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${pct}%;background:#e8b84b"></div>
+          </div>
+          <div class="exposure-value" style="color:#e8b84b">${pct}%</div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function renderSuggestions(suggestions) {
+    if (!suggestions || suggestions.length === 0) {
+      document.getElementById("suggestionsList").innerHTML =
+        `<p style="color:#888;text-align:center;padding:20px">
+          No improvements found — your deck is well optimized for this arena!
+        </p>`;
+      return;
+    }
+
+    document.getElementById("suggestionsList").innerHTML = suggestions.map((s, i) => `
+      <div class="suggestion-card">
+        <div class="swap-cards">
+          <div class="swap-card-chip swap-out">
+            ${cardImage(s.card_out.name, s.card_out.icon_url, "#f87171", "0.7")}
+            <div class="chip-name">✕ ${s.card_out.name}</div>
+            <div class="chip-elixir">${s.card_out.elixir} elixir</div>
+          </div>
+          <div class="swap-arrow">→</div>
+          <div class="swap-card-chip swap-in">
+            ${cardImage(s.card_in.name, s.card_in.icon_url, "#4ade80", "1")}
+            <div class="chip-name">✓ ${s.card_in.name}</div>
+            <div class="chip-elixir">${s.card_in.elixir} elixir</div>
+          </div>
+        </div>
+        <div class="suggestion-details">
+          ${i === 0 ? '<div class="best-badge">⭐ Best Swap</div>' : ''}
+          <div class="suggestion-explanation">${formatExplanation(s.explanation)}</div>
+          <div class="improvement-badge">↑ ${s.improvement_pct}% improvement</div>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function formatExplanation(text) {
+    return text.replace(/^Swap .+ → .+: /, "").replace(/\(score:.*\)/, "").trim();
+  }
+
+  function setLoading(on) {
+    document.getElementById("loadingBox").classList.toggle("hidden", !on);
+    document.getElementById("analyzeBtn").disabled = on;
+  }
+
+  function show(id) { document.getElementById(id).classList.remove("hidden"); }
+  function hide(id) { document.getElementById(id).classList.add("hidden"); }
+
+  function showError(msg) {
+    const box = document.getElementById("errorBox");
+    box.textContent = `Error: ${msg}`;
+    box.classList.remove("hidden");
+  }
+
+  function showAuthError(msg) {
+    const box = document.getElementById("authError");
+    box.textContent = msg;
+    box.classList.remove("hidden");
+    hide("authSuccess");
+  }
+
+  function showAuthSuccess(msg) {
+    const box = document.getElementById("authSuccess");
+    box.textContent = msg;
+    box.classList.remove("hidden");
+    hide("authError");
+  }
+
+  boot();
+</script>
+</body>
+</html>
