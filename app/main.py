@@ -9,6 +9,7 @@ from app.core.analyzer import DeckAnalyzer
 from app.core.meta_weighter import compute_meta_weights, apply_meta_weights
 from app.core.optimizer import DeckOptimizer
 from app.core.models import Deck
+from app.ml.cohesion_scorer import DeckCohesionScorer
 from app.db.database import engine
 from app.db import models
 from app.api import auth, user_data
@@ -19,7 +20,11 @@ async def lifespan(app: FastAPI):
     app.state.client = ClashRoyaleClient()
     app.state.card_registry = get_card_registry()
     app.state.analyzer = DeckAnalyzer()
-    app.state.optimizer = DeckOptimizer()
+    # DeckCohesionScorer loads card_embeddings.json at startup.
+    # If the file doesn't exist yet (train_embeddings.py hasn't been run),
+    # it logs a warning and degrades gracefully — the optimizer still works.
+    cohesion_scorer = DeckCohesionScorer()
+    app.state.optimizer = DeckOptimizer(cohesion_scorer=cohesion_scorer)
     yield
     await app.state.client.close()
 
@@ -134,6 +139,8 @@ async def get_player_analysis(player_tag: str):
             "score_before": round(swap.score_before, 3),
             "score_after": round(swap.score_after, 3),
             "improvement_pct": round(swap.improvement_pct, 1),
+            "cohesion_score": round(swap.cohesion_score, 2),
+            "affinity_bonus": round(swap.affinity_bonus, 2),
             "explanation": optimizer.explain_swap(swap),
         }
 

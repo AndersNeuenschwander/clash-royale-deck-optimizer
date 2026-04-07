@@ -2,8 +2,9 @@ fastapi
 uvicorn
 httpx
 python-dotenv
-echo "sqlalchemy
+sqlalchemy
 psycopg2-binary
 passlib[bcrypt]
 python-jose[cryptography]
-python-multipart" >> requirements.txt
+python-multipart
+numpy
