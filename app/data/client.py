@@ -7,7 +7,7 @@ load_dotenv()
 # We route through the RoyaleAPI proxy so we don't need a static IP.
 # The proxy forwards our request to api.clashroyale.com using the
 # whitelisted IP we registered (45.79.218.79).
-BASE_URL = "https://proxy.royaleapi.dev/v1"
+BASE_URL = "https://api.clashroyale.com/v1"
 
 
 class ClashRoyaleClient:
